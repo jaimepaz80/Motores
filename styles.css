@@ -93,12 +93,19 @@ h1, h2 {
 .motor-card.status-on {
     border-color: #2ecc71; 
     background-color: #eafaf1;
-    animation: blink-green-white 0.5s infinite; /* Animación aplicada solo si está encendido */
+    animation: blink-green-white 0.5s infinite; 
 }
 
 .motor-card.status-off {
     border-color: #e74c3c; 
     background-color: #fdedec;
+}
+
+.motor-card.status-empty {
+    border-color: #bdc3c7; 
+    background-color: #f8f9fa;
+    border-style: dashed;
+    color: #95a5a6;
 }
 
 .motor-card.status-maint {
