@@ -6,19 +6,19 @@ import { ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-dat
 const loginForm = document.getElementById('loginForm');
 const updateForm = document.getElementById('updateForm');
 const statusSelect = document.getElementById('statusSelect');
-const motivoGroup = document.getElementById('motivoGroup');
-const motivoInput = document.getElementById('motivoInput');
+const obsGroup = document.getElementById('obsGroup');
+const obsInput = document.getElementById('obsInput');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// Mostrar cuadro de texto solo si el estatus es "Apagado"
+// Mostrar cuadro de observación solo si el estatus es "Apagado"
 statusSelect.addEventListener('change', () => {
     if (statusSelect.value === 'Apagado') {
-        motivoGroup.style.display = 'block';
-        motivoInput.required = true;
+        obsGroup.style.display = 'block';
+        obsInput.required = true; // Hace que no se pueda guardar sin escribir algo
     } else {
-        motivoGroup.style.display = 'none';
-        motivoInput.required = false;
-        motivoInput.value = ''; // Limpiar el texto si se cambia a Prendido
+        obsGroup.style.display = 'none';
+        obsInput.required = false;
+        obsInput.value = ''; // Limpiar el texto si se cambia a Prendido
     }
 });
 
@@ -54,14 +54,14 @@ updateForm.addEventListener('submit', (e) => {
     const motorIndex = document.getElementById('motorSelect').value;
     const newType = document.getElementById('typeSelect').value;
     const newStatus = statusSelect.value;
-    const motivo = newStatus === 'Apagado' ? motivoInput.value : '';
+    const observacion = newStatus === 'Apagado' ? obsInput.value : '';
 
     // Escribir en la ruta exacta del motor
     const motorRef = ref(db, `motors/${motorIndex}`);
     set(motorRef, {
         type: newType,
         status: newStatus,
-        reason: motivo
+        observacion: observacion
     }).then(() => {
         alert('Estatus actualizado correctamente.');
     }).catch((error) => {
