@@ -1,0 +1,85 @@
+<!-- reportes.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Camaronera Majagual</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Librerías jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+    <nav class="tabs-nav">
+        <a href="index.html">Pestaña Motores</a>
+        <a href="admin.html">Pestaña Administración</a>
+        <a href="reportes.html">Reporte de Horas</a>
+    </nav>
+
+    <h1>Reporte de Horas de Bombeo</h1>
+
+    <div class="report-panel">
+        <form id="reportForm">
+            <div class="flex-group">
+                <div class="form-group">
+                    <label>Fecha/Hora Inicio:</label>
+                    <input type="datetime-local" id="filterStart" required>
+                </div>
+                <div class="form-group">
+                    <label>Fecha/Hora Fin:</label>
+                    <input type="datetime-local" id="filterEnd" required>
+                </div>
+            </div>
+
+            <div class="flex-group">
+                <div class="form-group">
+                    <label>Tipo de Motor:</label>
+                    <select id="filterType">
+                        <option value="Ambos">Ambos</option>
+                        <option value="Eléctrico">Eléctrico</option>
+                        <option value="Diésel">Diésel</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Estación:</label>
+                    <select id="filterStation">
+                        <option value="Todas">Todas</option>
+                        <option value="MA">Módulo A</option>
+                        <option value="MB">Módulo B</option>
+                        <option value="REB">Rebombeo</option>
+                        <option value="RAM">Ramon</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit">Generar Reporte en Pantalla</button>
+            <button type="button" id="btnPdf" class="btn-success" style="display:none;">Descargar PDF</button>
+        </form>
+
+        <div class="report-table-container" id="tableContainer" style="display:none;">
+            <table id="reportTable">
+                <thead>
+                    <tr>
+                        <th>Estación</th>
+                        <th>Motor</th>
+                        <th>Tipo</th>
+                        <th>Horas de Bombeo</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody">
+                    <!-- Filas dinámicas -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3" style="text-align: right;">Total General:</th>
+                        <th id="totalHoursCell">0.00 h</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <script type="module" src="reportes.js"></script>
+</body>
+</html>
