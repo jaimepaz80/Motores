@@ -73,12 +73,13 @@
                 <select id="statusSelect" required>
                     <option value="Prendido">Prendido</option>
                     <option value="Apagado">Apagado</option>
-                    <option value="En mantenimiento">En mantenimiento</option>
-                    <option value="Preventivo">Preventivo</option>
-                    <option value="Correctivo">Correctivo</option>
-                    <!-- Falta de fluido eléctrica solo aparecerá si es eléctrico en admin.js -->
-                    <option value="Falta de fluido eléctrica" id="elecStatus" style="display:none;">Falta de fluido eléctrica</option>
                 </select>
+            </div>
+
+            <!-- Cuadro de texto para el motivo (Oculto por defecto) -->
+            <div class="form-group" id="motivoGroup" style="display:none;">
+                <label for="motivoInput">Motivo del apagado:</label>
+                <input type="text" id="motivoInput" placeholder="Ej: Mantenimiento, Daño eléctrico, etc.">
             </div>
 
             <button type="submit">Actualizar Estatus</button>
