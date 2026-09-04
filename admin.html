@@ -6,76 +6,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administración - Camaronera Majagual</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Ocultar el panel de administración por defecto */
-        .admin-panel { display: none; }
-    </style>
+    <style> .admin-panel { display: none; } </style>
 </head>
 <body>
-    <!-- Pestañas de navegación -->
     <nav class="tabs-nav">
         <a href="index.html">Pestaña Motores</a>
         <a href="admin.html">Pestaña Administración</a>
+        <a href="reportes.html">Reporte de Horas</a>
     </nav>
 
     <h1>Panel de Administración</h1>
 
-    <!-- Formulario de Login -->
     <div id="loginSection" class="login-container">
         <h2>Iniciar Sesión</h2>
         <form id="loginForm">
             <div class="form-group">
-                <label for="email">Correo Electrónico:</label>
+                <label>Correo Electrónico:</label>
                 <input type="email" id="email" required>
             </div>
             <div class="form-group">
-                <label for="password">Contraseña:</label>
+                <label>Contraseña:</label>
                 <input type="password" id="password" required>
             </div>
             <button type="submit">Entrar</button>
         </form>
     </div>
 
-    <!-- Panel de Gestión (Protegido) -->
     <div id="adminPanel" class="admin-panel">
         <h2>Actualizar Estatus de Motores</h2>
         <form id="updateForm">
             <div class="form-group">
-                <label for="motorSelect">Seleccionar Motor:</label>
+                <label>Seleccionar Motor:</label>
                 <select id="motorSelect" required>
                     <!-- Módulo A -->
-                    <option value="0">MA1</option>
-                    <option value="1">MA2</option>
-                    <option value="2">MA3</option>
-                    <option value="3">MA4</option>
-                    <option value="4">MA5</option>
-                    <option value="5">MA6</option>
+                    <option value="0">MA1</option><option value="1">MA2</option><option value="2">MA3</option>
+                    <option value="3">MA4</option><option value="4">MA5</option><option value="5">MA6</option>
                     <!-- Módulo B -->
-                    <option value="6">MB1</option>
-                    <option value="7">MB2</option>
-                    <option value="8">MB3</option>
-                    <option value="9">MB4</option>
-                    <option value="10">MB5</option>
-                    <option value="11">MB6</option>
+                    <option value="6">MB1</option><option value="7">MB2</option><option value="8">MB3</option>
+                    <option value="9">MB4</option><option value="10">MB5</option><option value="11">MB6</option>
                     <!-- Rebombeo -->
-                    <option value="12">REB1 (Rebombeo)</option>
-                    <option value="13">REB2 (Rebombeo)</option>
-                    <option value="14">REB3 (Rebombeo)</option>
-                    <option value="15">REB4 (Rebombeo)</option>
-                    <option value="16">REB5 (Rebombeo)</option>
-                    <option value="17">REB6 (Rebombeo)</option>
+                    <option value="12">REB1 (Rebombeo)</option><option value="13">REB2 (Rebombeo)</option>
+                    <option value="14">REB3 (Rebombeo)</option><option value="15">REB4 (Rebombeo)</option>
+                    <option value="16">REB5 (Rebombeo)</option><option value="17">REB6 (Rebombeo)</option>
                     <!-- Ramon -->
-                    <option value="18">RAM1 (Ramon)</option>
-                    <option value="19">RAM2 (Ramon)</option>
-                    <option value="20">RAM3 (Ramon)</option>
-                    <option value="21">RAM4 (Ramon)</option>
-                    <option value="22">RAM5 (Ramon)</option>
-                    <option value="23">RAM6 (Ramon)</option>
+                    <option value="18">RAM1 (Ramon)</option><option value="19">RAM2 (Ramon)</option>
+                    <option value="20">RAM3 (Ramon)</option><option value="21">RAM4 (Ramon)</option>
+                    <option value="22">RAM5 (Ramon)</option><option value="23">RAM6 (Ramon)</option>
                 </select>
             </div>
 
             <div class="form-group" id="typeGroup">
-                <label for="typeSelect">Tipo de Motor (Intercambiable):</label>
+                <label>Tipo de Motor:</label>
                 <select id="typeSelect" required>
                     <option value="Diésel">Diésel</option>
                     <option value="Eléctrico">Eléctrico</option>
@@ -83,7 +64,7 @@
             </div>
 
             <div class="form-group">
-                <label for="statusSelect">Nuevo Estatus:</label>
+                <label>Nuevo Estatus:</label>
                 <select id="statusSelect" required>
                     <option value="Prendido">Prendido</option>
                     <option value="Apagado">Apagado</option>
@@ -91,9 +72,20 @@
                 </select>
             </div>
 
-            <!-- Cuadro de texto para la observación (Oculto por defecto) -->
+            <!-- Campos de Fecha y Hora obligatorios -->
+            <div class="flex-group" id="dateTimeGroup">
+                <div class="form-group">
+                    <label>Fecha del evento:</label>
+                    <input type="date" id="dateInput" required>
+                </div>
+                <div class="form-group">
+                    <label>Hora del evento:</label>
+                    <input type="time" id="timeInput" required>
+                </div>
+            </div>
+
             <div class="form-group" id="obsGroup" style="display:none;">
-                <label for="obsInput">Observación (Solo si está apagado):</label>
+                <label>Observación (Solo si está apagado):</label>
                 <input type="text" id="obsInput" placeholder="Ej: Daño eléctrico, Mantenimiento...">
             </div>
 
