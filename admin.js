@@ -6,19 +6,27 @@ import { ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-dat
 const loginForm = document.getElementById('loginForm');
 const updateForm = document.getElementById('updateForm');
 const statusSelect = document.getElementById('statusSelect');
+const typeGroup = document.getElementById('typeGroup');
 const obsGroup = document.getElementById('obsGroup');
 const obsInput = document.getElementById('obsInput');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// Mostrar cuadro de observación solo si el estatus es "Apagado"
+// Controlar visualización de los campos según el estatus
 statusSelect.addEventListener('change', () => {
-    if (statusSelect.value === 'Apagado') {
-        obsGroup.style.display = 'block';
-        obsInput.required = true; // Hace que no se pueda guardar sin escribir algo
-    } else {
+    if (statusSelect.value === 'Sin motor') {
+        typeGroup.style.display = 'none'; // No hay motor, no hay tipo
         obsGroup.style.display = 'none';
         obsInput.required = false;
-        obsInput.value = ''; // Limpiar el texto si se cambia a Prendido
+        obsInput.value = '';
+    } else if (statusSelect.value === 'Apagado') {
+        typeGroup.style.display = 'block';
+        obsGroup.style.display = 'block';
+        obsInput.required = true;
+    } else { // Prendido
+        typeGroup.style.display = 'block';
+        obsGroup.style.display = 'none';
+        obsInput.required = false;
+        obsInput.value = '';
     }
 });
 
@@ -52,8 +60,12 @@ onAuthStateChanged(auth, (user) => {
 updateForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const motorIndex = document.getElementById('motorSelect').value;
-    const newType = document.getElementById('typeSelect').value;
     const newStatus = statusSelect.value;
+    
+    // Si no hay motor, forzamos el tipo a "Ninguno", de lo contrario tomamos el del selector
+    const newType = newStatus === 'Sin motor' ? 'Ninguno' : document.getElementById('typeSelect').value;
+    
+    // Observación solo aplica si está apagado
     const observacion = newStatus === 'Apagado' ? obsInput.value : '';
 
     // Escribir en la ruta exacta del motor
