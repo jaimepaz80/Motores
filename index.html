@@ -1,0 +1,34 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoreo - Camaronera Majagual</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Camaronera Majagual</h1>
+    <h2>Estatus de Motores en Tiempo Real</h2>
+
+    <div class="stations-container">
+        <!-- Módulo A -->
+        <div class="station-module">
+            <h2>Módulo A</h2>
+            <div id="moduleA-grid" class="motor-grid">
+                <!-- Se llenará dinámicamente con viewer.js -->
+            </div>
+        </div>
+
+        <!-- Módulo B -->
+        <div class="station-module">
+            <h2>Módulo B</h2>
+            <div id="moduleB-grid" class="motor-grid">
+                <!-- Se llenará dinámicamente con viewer.js -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="viewer.js"></script>
+</body>
+</html>
