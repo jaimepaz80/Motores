@@ -42,14 +42,21 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Estación:</label>
-                    <select id="filterStation">
-                        <option value="Todas">Todas</option>
-                        <option value="MA">Módulo A</option>
-                        <option value="MB">Módulo B</option>
-                        <option value="REB">Rebombeo</option>
-                        <option value="RAM">Ramon</option>
-                    </select>
+                    <label>Estaciones (Seleccione una, varias o todas):</label>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px;">
+                        <label style="display: inline-flex; align-items: center; font-weight: normal;">
+                            <input type="checkbox" class="station-cb" value="MA" checked> Módulo A
+                        </label>
+                        <label style="display: inline-flex; align-items: center; font-weight: normal;">
+                            <input type="checkbox" class="station-cb" value="MB" checked> Módulo B
+                        </label>
+                        <label style="display: inline-flex; align-items: center; font-weight: normal;">
+                            <input type="checkbox" class="station-cb" value="REB" checked> Rebombeo
+                        </label>
+                        <label style="display: inline-flex; align-items: center; font-weight: normal;">
+                            <input type="checkbox" class="station-cb" value="RAM" checked> Ramon
+                        </label>
+                    </div>
                 </div>
             </div>
 
