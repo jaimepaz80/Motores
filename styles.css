@@ -108,19 +108,9 @@ h1, h2 {
     color: #95a5a6;
 }
 
-.motor-card.status-maint {
-    border-color: #95a5a6; 
-    background-color: #f4f6f6;
-}
-
-.motor-card.status-elec {
-    border-color: #f1c40f; 
-    background-color: #fef9e7;
-}
-
-/* Panel de Administración */
-.login-container, .admin-panel {
-    max-width: 600px;
+/* Panel de Administración y Reportes */
+.login-container, .admin-panel, .report-panel {
+    max-width: 800px;
     margin: 20px auto 40px auto;
     background: white;
     padding: 30px;
@@ -130,6 +120,15 @@ h1, h2 {
 
 .form-group {
     margin-bottom: 15px;
+}
+
+.flex-group {
+    display: flex;
+    gap: 15px;
+}
+
+.flex-group .form-group {
+    flex: 1;
 }
 
 label {
@@ -155,6 +154,7 @@ button {
     border-radius: 4px;
     cursor: pointer;
     font-size: 1em;
+    margin-top: 10px;
 }
 
 button:hover {
@@ -164,4 +164,38 @@ button:hover {
 #logoutBtn {
     background-color: #e74c3c;
     margin-top: 20px;
+}
+
+.btn-success {
+    background-color: #2ecc71;
+}
+.btn-success:hover {
+    background-color: #27ae60;
+}
+
+/* Tablas de Reportes */
+.report-table-container {
+    margin-top: 30px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+th {
+    background-color: #2c3e50;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
 }
