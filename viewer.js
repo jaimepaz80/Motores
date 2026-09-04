@@ -45,8 +45,8 @@ onValue(motorsRef, (snapshot) => {
                 prefix = 'REB';
                 gridTarget = moduleCGrid; // Rebombeo
             } else {
-                prefix = 'SA';
-                gridTarget = moduleDGrid; // San Antonio
+                prefix = 'RAM';
+                gridTarget = moduleDGrid; // Ramon
             }
 
             const motorNumber = (i % 6) + 1;
