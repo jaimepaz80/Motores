@@ -10,14 +10,10 @@ const motorsRef = ref(db, 'motors');
 
 // Función para mapear el estatus a una clase CSS
 function getStatusClass(status) {
-    switch (status) {
-        case 'Prendido': return 'status-on';
-        case 'Apagado': return 'status-off';
-        case 'En mantenimiento': return 'status-maint';
-        case 'Preventivo': return 'status-maint';
-        case 'Correctivo': return 'status-off'; // O podrías usar 'status-maint' si lo prefieres gris
-        case 'Falta de fluido eléctrica': return 'status-elec';
-        default: return '';
+    if (status === 'Prendido') {
+        return 'status-on';
+    } else {
+        return 'status-off';
     }
 }
 
@@ -31,7 +27,8 @@ onValue(motorsRef, (snapshot) => {
 
         // Recorrer los 12 motores (0 al 11)
         for (let i = 0; i < 12; i++) {
-            const motorData = data[i];
+            // Asignar valores por defecto si no existen datos iniciales
+            const motorData = data[i] || { status: 'Apagado', type: 'Desconocido', reason: '' };
             const motorCard = document.createElement('div');
             
             // Determinar módulo y nombre
@@ -39,11 +36,18 @@ onValue(motorsRef, (snapshot) => {
             const motorNumber = (i % 6) + 1;
             const motorName = `M${module}${motorNumber}`;
 
+            // Preparar el texto a mostrar en la tarjeta
+            let displayStatus = motorData.status;
+            if (motorData.status === 'Apagado' && motorData.reason) {
+                // Agregar el motivo si está apagado y existe un motivo guardado
+                displayStatus = `Apagado<br><span style="font-size: 0.85em; font-weight: normal;">(${motorData.reason})</span>`;
+            }
+
             motorCard.className = `motor-card ${getStatusClass(motorData.status)}`;
             motorCard.innerHTML = `
                 <div class="motor-name">${motorName}</div>
                 <div class="motor-type">${motorData.type}</div>
-                <div class="motor-status">${motorData.status}</div>
+                <div class="motor-status">${displayStatus}</div>
             `;
 
             if (module === 'A') {
