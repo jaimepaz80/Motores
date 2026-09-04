@@ -3,7 +3,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f4f7f6;
     margin: 0;
-    padding: 0; /* Modificado a 0 para que la barra nav ocupe todo el ancho arriba */
+    padding: 0; 
     color: #333;
 }
 
@@ -82,10 +82,18 @@ h1, h2 {
     text-transform: uppercase;
 }
 
+/* Animación de parpadeo continuo (0.5s) */
+@keyframes blink-green-white {
+    0% { background-color: #eafaf1; border-color: #2ecc71; }
+    50% { background-color: #ffffff; border-color: #ffffff; }
+    100% { background-color: #eafaf1; border-color: #2ecc71; }
+}
+
 /* Estados Gráficos (Colores) */
 .motor-card.status-on {
     border-color: #2ecc71; 
     background-color: #eafaf1;
+    animation: blink-green-white 0.5s infinite; /* Animación aplicada solo si está encendido */
 }
 
 .motor-card.status-off {
