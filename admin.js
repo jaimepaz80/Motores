@@ -5,20 +5,20 @@ import { ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-dat
 
 const loginForm = document.getElementById('loginForm');
 const updateForm = document.getElementById('updateForm');
-const typeSelect = document.getElementById('typeSelect');
-const elecStatusOption = document.getElementById('elecStatus');
+const statusSelect = document.getElementById('statusSelect');
+const motivoGroup = document.getElementById('motivoGroup');
+const motivoInput = document.getElementById('motivoInput');
 const logoutBtn = document.getElementById('logoutBtn');
 
-// Controlar visualización de estatus eléctrico
-typeSelect.addEventListener('change', () => {
-    if (typeSelect.value === 'Eléctrico') {
-        elecStatusOption.style.display = 'block';
+// Mostrar cuadro de texto solo si el estatus es "Apagado"
+statusSelect.addEventListener('change', () => {
+    if (statusSelect.value === 'Apagado') {
+        motivoGroup.style.display = 'block';
+        motivoInput.required = true;
     } else {
-        elecStatusOption.style.display = 'none';
-        // Reiniciar estatus si estaba en falta eléctrica
-        if (document.getElementById('statusSelect').value === 'Falta de fluido eléctrica') {
-            document.getElementById('statusSelect').value = 'Apagado';
-        }
+        motivoGroup.style.display = 'none';
+        motivoInput.required = false;
+        motivoInput.value = ''; // Limpiar el texto si se cambia a Prendido
     }
 });
 
@@ -53,13 +53,15 @@ updateForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const motorIndex = document.getElementById('motorSelect').value;
     const newType = document.getElementById('typeSelect').value;
-    const newStatus = document.getElementById('statusSelect').value;
+    const newStatus = statusSelect.value;
+    const motivo = newStatus === 'Apagado' ? motivoInput.value : '';
 
-    // Escribir en la ruta exacta del motor (motors/0, motors/1, etc.)
+    // Escribir en la ruta exacta del motor
     const motorRef = ref(db, `motors/${motorIndex}`);
     set(motorRef, {
         type: newType,
-        status: newStatus
+        status: newStatus,
+        reason: motivo
     }).then(() => {
         alert('Estatus actualizado correctamente.');
     }).catch((error) => {
