@@ -27,8 +27,8 @@ onValue(motorsRef, (snapshot) => {
 
         // Recorrer los 12 motores (0 al 11)
         for (let i = 0; i < 12; i++) {
-            // Asignar valores por defecto si no existen datos iniciales
-            const motorData = data[i] || { status: 'Apagado', type: 'Desconocido', reason: '' };
+            // Asignar valores por defecto para evitar errores si Firebase está vacío
+            const motorData = data[i] || { status: 'Apagado', type: 'Desconocido', observacion: '' };
             const motorCard = document.createElement('div');
             
             // Determinar módulo y nombre
@@ -38,9 +38,9 @@ onValue(motorsRef, (snapshot) => {
 
             // Preparar el texto a mostrar en la tarjeta
             let displayStatus = motorData.status;
-            if (motorData.status === 'Apagado' && motorData.reason) {
-                // Agregar el motivo si está apagado y existe un motivo guardado
-                displayStatus = `Apagado<br><span style="font-size: 0.85em; font-weight: normal;">(${motorData.reason})</span>`;
+            if (motorData.status === 'Apagado' && motorData.observacion) {
+                // Agregar la observación de forma visible si está apagado
+                displayStatus = `Apagado<br><span style="font-size: 0.85em; font-weight: bold; color: #555;">(Obs: ${motorData.observacion})</span>`;
             }
 
             motorCard.className = `motor-card ${getStatusClass(motorData.status)}`;
