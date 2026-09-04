@@ -24,7 +24,15 @@ reportForm.addEventListener('submit', async (e) => {
     const startFilter = new Date(document.getElementById('filterStart').value).getTime();
     const endFilter = new Date(document.getElementById('filterEnd').value).getTime();
     const filterType = document.getElementById('filterType').value;
-    const filterStationCode = document.getElementById('filterStation').value;
+    
+    // Leer checkboxes seleccionados
+    const checkboxes = document.querySelectorAll('.station-cb:checked');
+    const selectedStations = Array.from(checkboxes).map(cb => cb.value);
+
+    if (selectedStations.length === 0) {
+        alert("Debe seleccionar al menos una estación de bombeo.");
+        return;
+    }
 
     if (endFilter <= startFilter) {
         alert("La fecha de fin debe ser mayor a la fecha de inicio.");
@@ -66,8 +74,8 @@ reportForm.addEventListener('submit', async (e) => {
         for (let i = 0; i < 24; i++) {
             const motorInfo = getMotorInfo(i);
             
-            // Filtro de estación
-            if (filterStationCode !== 'Todas' && motorInfo.prefix !== filterStationCode) continue;
+            // Filtro de estación múltiple
+            if (!selectedStations.includes(motorInfo.prefix)) continue;
 
             const events = eventsByMotor[i];
             if (events.length === 0) continue;
