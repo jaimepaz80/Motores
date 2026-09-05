@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoreo - Camaronera Majagual</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <!-- Pestañas de navegación -->
     <nav class="tabs-nav">
         <a href="index.html">Pestaña Motores</a>
         <a href="admin.html">Pestaña Administración</a>
@@ -19,28 +19,38 @@
     <h2>Estatus de Motores en Tiempo Real</h2>
 
     <div class="stations-container">
-        <!-- Módulo A -->
         <div class="station-module">
             <h2>Módulo A</h2>
             <div id="moduleA-grid" class="motor-grid"></div>
         </div>
-        <!-- Módulo B -->
         <div class="station-module">
             <h2>Módulo B</h2>
             <div id="moduleB-grid" class="motor-grid"></div>
         </div>
-        <!-- Estación Rebombeo -->
         <div class="station-module">
             <h2>Rebombeo</h2>
             <div id="moduleC-grid" class="motor-grid"></div>
         </div>
-        <!-- Estación Ramon -->
         <div class="station-module">
             <h2>Ramon</h2>
             <div id="moduleD-grid" class="motor-grid"></div>
         </div>
     </div>
 
+    <!-- Modal de Alerta (Oculto por defecto) -->
+    <div id="alertModal" class="modal-overlay" style="display: none;">
+        <div id="alertBox" class="modal-content">
+            <h2 id="alertTitle">CAMBIO DE ESTATUS</h2>
+            <div id="alertDetails" class="alert-details"></div>
+            <button id="alertCloseBtn">Cerrar</button>
+        </div>
+    </div>
+
     <script type="module" src="viewer.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </body>
 </html>
