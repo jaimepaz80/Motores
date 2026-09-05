@@ -75,6 +75,9 @@ updateForm.addEventListener('submit', async (e) => {
             }
         }
 
+        const currentTotal = currentData && currentData.total_hours ? currentData.total_hours : 0;
+        const currentLastCycle = currentData && currentData.last_cycle_hours ? currentData.last_cycle_hours : 0;
+
         const updateData = { type: newType, status: newStatus, observacion: observacion };
         
         if (newStatus !== 'Sin motor') {
@@ -83,8 +86,20 @@ updateForm.addEventListener('submit', async (e) => {
 
         if (newStatus === 'Prendido') {
             updateData.last_startTime = eventTimestamp;
+            updateData.total_hours = currentTotal;
+            updateData.last_cycle_hours = currentLastCycle;
         } else if (newStatus === 'Apagado') {
             updateData.last_startTime = currentData ? currentData.last_startTime : null; 
+            
+            let cycleHours = 0;
+            if (currentData && currentData.last_startTime && eventTimestamp > currentData.last_startTime) {
+                cycleHours = (eventTimestamp - currentData.last_startTime) / (1000 * 60 * 60);
+            }
+            updateData.last_cycle_hours = cycleHours;
+            updateData.total_hours = currentTotal + cycleHours;
+        } else if (newStatus === 'Sin motor') {
+            updateData.total_hours = currentTotal;
+            updateData.last_cycle_hours = currentLastCycle;
         }
 
         await set(motorRef, updateData);
