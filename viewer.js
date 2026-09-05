@@ -12,6 +12,7 @@ const motorsRef = ref(db, 'motors');
 // Lógica de Memoria Silenciosa y Alertas
 let initialLoad = true;
 let previousState = {};
+let lastKnownData = null;
 
 // Solicitar permiso de notificaciones de Android/Chrome al entrar
 if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
@@ -90,11 +91,26 @@ function renderGrid(data) {
         const motorName = `${motorInfo.prefix}${motorInfo.num}`;
         let displayStatus = motorData.status;
         let displayType = motorData.type;
+        let hoursHtml = '';
 
         if (motorData.status === 'Sin motor') {
             displayType = '-';
-        } else if (motorData.status === 'Apagado' && motorData.observacion) {
-            displayStatus = `Apagado<br><span style="font-size: 0.85em; font-weight: bold; color: #555;">(Obs: ${motorData.observacion})</span>`;
+        } else {
+            if (motorData.status === 'Apagado' && motorData.observacion) {
+                displayStatus = `Apagado<br><span style="font-size: 0.85em; font-weight: bold; color: #555;">(Obs: ${motorData.observacion})</span>`;
+            }
+            
+            // Lógica del Cronómetro vs Estático
+            const totalH = motorData.total_hours || 0;
+            const lastH = motorData.last_cycle_hours || 0;
+            
+            if (motorData.status === 'Prendido' && motorData.last_startTime) {
+                const liveMs = Math.max(0, Date.now() - motorData.last_startTime);
+                const liveH = liveMs / (1000 * 60 * 60);
+                hoursHtml = `<div class="motor-hours">Total: ${(totalH + liveH).toFixed(2)}h<br>Actual: ${liveH.toFixed(2)}h</div>`;
+            } else {
+                hoursHtml = `<div class="motor-hours">Total: ${totalH.toFixed(2)}h<br>Último: ${lastH.toFixed(2)}h</div>`;
+            }
         }
 
         motorCard.className = `motor-card ${getStatusClass(motorData.status)}`;
@@ -102,6 +118,7 @@ function renderGrid(data) {
             <div class="motor-name">${motorName}</div>
             <div class="motor-type">${displayType}</div>
             <div class="motor-status">${displayStatus}</div>
+            ${hoursHtml}
         `;
         gridTarget.appendChild(motorCard);
     }
@@ -110,6 +127,7 @@ function renderGrid(data) {
 onValue(motorsRef, (snapshot) => {
     const data = snapshot.val();
     if (data) {
+        lastKnownData = data; // Guardamos en memoria local
         if (initialLoad) {
             for (let i = 0; i < 24; i++) {
                 previousState[i] = data[i] ? data[i].status : 'Apagado';
@@ -131,3 +149,8 @@ onValue(motorsRef, (snapshot) => {
         renderGrid(data);
     }
 });
+
+// Bucle de cronómetro: re-renderiza la pantalla cada 60 segundos leyendo la memoria
+setInterval(() => {
+    if (lastKnownData) renderGrid(lastKnownData);
+}, 60000);
