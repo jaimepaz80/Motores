@@ -42,11 +42,18 @@ function triggerAlert(index, motorData) {
     const eventTime = motorData.last_eventTime ? new Date(motorData.last_eventTime).toLocaleString() : new Date().toLocaleString();
     const obsText = motorData.observacion ? `<br><b>Observaciones:</b> ${motorData.observacion}` : '';
 
-    // Notificación Nativa Android
+    // Notificación Nativa Android vía Service Worker
     if ("Notification" in window && Notification.permission === "granted") {
-        new Notification(`Majagual: ${title}`, {
-            body: `${motorInfo.station} - ${motorInfo.prefix}${motorInfo.num}\nFecha/Hora: ${eventTime}`
-        });
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then((registration) => {
+                registration.showNotification(`Majagual: ${title}`, {
+                    body: `${motorInfo.station} - ${motorInfo.prefix}${motorInfo.num}\nFecha/Hora: ${eventTime}`,
+                    icon: './icono.png', // Usa el logo que subiste
+                    vibrate: [200, 100, 200, 100, 200], // Patrón de vibración de alerta
+                    requireInteraction: true // Mantiene la notificación hasta que el usuario la toque
+                });
+            });
+        }
     }
 
     // Ventana Emergente Modal
