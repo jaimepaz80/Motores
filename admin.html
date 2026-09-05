@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administración - Camaronera Majagual</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
     <style> .admin-panel { display: none; } </style>
 </head>
 <body>
@@ -95,5 +96,8 @@
     </div>
 
     <script type="module" src="admin.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+    </script>
 </body>
 </html>
