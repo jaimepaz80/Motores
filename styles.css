@@ -249,3 +249,13 @@ tr:nth-child(even) {
 #alertCloseBtn:hover {
     background-color: #1a252f;
 }
+
+/* CSS para horas de bombeo */
+.motor-hours {
+    font-size: 0.75em;
+    color: #2c3e50;
+    margin-top: 8px;
+    padding-top: 5px;
+    border-top: 1px solid #ccc;
+    font-weight: bold;
+}
