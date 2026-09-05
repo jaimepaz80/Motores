@@ -23,7 +23,7 @@ function getMotorInfo(id) {
     if (id < 6) return { station: 'Módulo A', prefix: 'MA', num: (id % 6) + 1 };
     if (id < 12) return { station: 'Módulo B', prefix: 'MB', num: (id % 6) + 1 };
     if (id < 18) return { station: 'Rebombeo', prefix: 'REB', num: (id % 6) + 1 };
-    return { station: 'Ramon', prefix: 'RAM', num: (id % 6) + 1 };
+    return { station: 'San Ramón', prefix: 'RAM', num: (id % 6) + 1 };
 }
 
 function getStatusClass(status) {
