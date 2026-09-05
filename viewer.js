@@ -2,13 +2,28 @@
 import { db } from "./firebase-config.js";
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// Declaración de los 4 contenedores
 const moduleAGrid = document.getElementById('moduleA-grid');
 const moduleBGrid = document.getElementById('moduleB-grid');
 const moduleCGrid = document.getElementById('moduleC-grid');
 const moduleDGrid = document.getElementById('moduleD-grid');
 
 const motorsRef = ref(db, 'motors');
+
+// Lógica de Memoria Silenciosa y Alertas
+let initialLoad = true;
+let previousState = {};
+
+// Solicitar permiso de notificaciones de Android/Chrome al entrar
+if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+    Notification.requestPermission();
+}
+
+function getMotorInfo(id) {
+    if (id < 6) return { station: 'Módulo A', prefix: 'MA', num: (id % 6) + 1 };
+    if (id < 12) return { station: 'Módulo B', prefix: 'MB', num: (id % 6) + 1 };
+    if (id < 18) return { station: 'Rebombeo', prefix: 'REB', num: (id % 6) + 1 };
+    return { station: 'Ramon', prefix: 'RAM', num: (id % 6) + 1 };
+}
 
 function getStatusClass(status) {
     if (status === 'Prendido') return 'status-on';
@@ -17,59 +32,102 @@ function getStatusClass(status) {
     return 'status-off'; 
 }
 
+function triggerAlert(index, motorData) {
+    const motorInfo = getMotorInfo(index);
+    const isPrendido = motorData.status === 'Prendido';
+    const colorClass = isPrendido ? 'alert-green' : 'alert-red';
+    const title = isPrendido ? 'MOTOR ENCENDIDO' : 'MOTOR APAGADO';
+    
+    const eventTime = motorData.last_eventTime ? new Date(motorData.last_eventTime).toLocaleString() : new Date().toLocaleString();
+    const obsText = motorData.observacion ? `<br><b>Observaciones:</b> ${motorData.observacion}` : '';
+
+    // Notificación Nativa Android
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(`Majagual: ${title}`, {
+            body: `${motorInfo.station} - ${motorInfo.prefix}${motorInfo.num}\nFecha/Hora: ${eventTime}`
+        });
+    }
+
+    // Ventana Emergente Modal
+    const modal = document.getElementById('alertModal');
+    const box = document.getElementById('alertBox');
+    const titleEl = document.getElementById('alertTitle');
+    const detailsEl = document.getElementById('alertDetails');
+
+    box.className = `modal-content ${colorClass}`;
+    titleEl.textContent = title;
+    detailsEl.innerHTML = `
+        <p><b>Estación:</b> ${motorInfo.station}</p>
+        <p><b>Bomba:</b> ${motorInfo.prefix}${motorInfo.num}</p>
+        <p><b>Tipo:</b> ${motorData.type}</p>
+        <p><b>Fecha y Hora:</b> ${eventTime}</p>
+        ${!isPrendido ? `<p style="color: #e74c3c;">${obsText}</p>` : ''}
+    `;
+    
+    modal.style.display = 'flex';
+}
+
+document.getElementById('alertCloseBtn').addEventListener('click', () => {
+    document.getElementById('alertModal').style.display = 'none';
+});
+
+function renderGrid(data) {
+    moduleAGrid.innerHTML = ''; 
+    moduleBGrid.innerHTML = '';
+    moduleCGrid.innerHTML = ''; 
+    moduleDGrid.innerHTML = '';
+
+    for (let i = 0; i < 24; i++) {
+        const motorData = data[i] || { status: 'Apagado', type: 'Desconocido', observacion: '' };
+        const motorCard = document.createElement('div');
+        const motorInfo = getMotorInfo(i);
+        
+        let gridTarget = moduleAGrid;
+        if (motorInfo.prefix === 'MB') gridTarget = moduleBGrid;
+        if (motorInfo.prefix === 'REB') gridTarget = moduleCGrid;
+        if (motorInfo.prefix === 'RAM') gridTarget = moduleDGrid;
+
+        const motorName = `${motorInfo.prefix}${motorInfo.num}`;
+        let displayStatus = motorData.status;
+        let displayType = motorData.type;
+
+        if (motorData.status === 'Sin motor') {
+            displayType = '-';
+        } else if (motorData.status === 'Apagado' && motorData.observacion) {
+            displayStatus = `Apagado<br><span style="font-size: 0.85em; font-weight: bold; color: #555;">(Obs: ${motorData.observacion})</span>`;
+        }
+
+        motorCard.className = `motor-card ${getStatusClass(motorData.status)}`;
+        motorCard.innerHTML = `
+            <div class="motor-name">${motorName}</div>
+            <div class="motor-type">${displayType}</div>
+            <div class="motor-status">${displayStatus}</div>
+        `;
+        gridTarget.appendChild(motorCard);
+    }
+}
+
 onValue(motorsRef, (snapshot) => {
     const data = snapshot.val();
     if (data) {
-        // Limpiar los 4 grids
-        moduleAGrid.innerHTML = '';
-        moduleBGrid.innerHTML = '';
-        moduleCGrid.innerHTML = '';
-        moduleDGrid.innerHTML = '';
-
-        // Recorrer los 24 motores (0 al 23)
-        for (let i = 0; i < 24; i++) {
-            const motorData = data[i] || { status: 'Apagado', type: 'Desconocido', observacion: '' };
-            const motorCard = document.createElement('div');
-            
-            let gridTarget = null;
-            let prefix = '';
-
-            // Lógica de enrutamiento por estaciones
-            if (i < 6) {
-                prefix = 'MA';
-                gridTarget = moduleAGrid;
-            } else if (i < 12) {
-                prefix = 'MB';
-                gridTarget = moduleBGrid;
-            } else if (i < 18) {
-                prefix = 'REB';
-                gridTarget = moduleCGrid; // Rebombeo
-            } else {
-                prefix = 'RAM';
-                gridTarget = moduleDGrid; // Ramon
+        if (initialLoad) {
+            for (let i = 0; i < 24; i++) {
+                previousState[i] = data[i] ? data[i].status : 'Apagado';
             }
-
-            const motorNumber = (i % 6) + 1;
-            const motorName = `${prefix}${motorNumber}`;
-
-            let displayStatus = motorData.status;
-            let displayType = motorData.type;
-
-            if (motorData.status === 'Sin motor') {
-                displayType = '-';
-            } else if (motorData.status === 'Apagado' && motorData.observacion) {
-                displayStatus = `Apagado<br><span style="font-size: 0.85em; font-weight: bold; color: #555;">(Obs: ${motorData.observacion})</span>`;
+            initialLoad = false;
+        } else {
+            for (let i = 0; i < 24; i++) {
+                const currentMotor = data[i] || { status: 'Apagado' };
+                const prevStatus = previousState[i];
+                
+                if (prevStatus !== currentMotor.status) {
+                    if (currentMotor.status === 'Prendido' || currentMotor.status === 'Apagado') {
+                        triggerAlert(i, currentMotor);
+                    }
+                    previousState[i] = currentMotor.status;
+                }
             }
-
-            motorCard.className = `motor-card ${getStatusClass(motorData.status)}`;
-            motorCard.innerHTML = `
-                <div class="motor-name">${motorName}</div>
-                <div class="motor-type">${displayType}</div>
-                <div class="motor-status">${displayStatus}</div>
-            `;
-
-            // Imprimir en la estación correspondiente
-            gridTarget.appendChild(motorCard);
         }
+        renderGrid(data);
     }
 });
