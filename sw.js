@@ -4,5 +4,5 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-    // Permite que la app funcione aunque no haya caché programada
+    // Permite que la app funcione en segundo plano
 });
