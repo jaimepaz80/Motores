@@ -18,6 +18,7 @@
 
     <h1>Panel de Administración</h1>
 
+    <!-- Login -->
     <div id="loginSection" class="login-container">
         <h2>Iniciar Sesión</h2>
         <form id="loginForm">
@@ -33,6 +34,7 @@
         </form>
     </div>
 
+    <!-- Panel de Operación Diaria -->
     <div id="adminPanel" class="admin-panel">
         <h2>Actualizar Estatus de Motores</h2>
         <form id="updateForm">
@@ -91,6 +93,51 @@
 
             <button type="submit">Actualizar Estatus</button>
         </form>
+    </div>
+
+    <!-- Panel de Configuración Avanzada y Calibración -->
+    <div id="advancedPanel" class="admin-panel" style="margin-top: 20px;">
+        <h2>Configuración Avanzada (Nombres y Horómetro)</h2>
+        <form id="advancedForm">
+            <div class="form-group">
+                <label>Seleccionar Motor a Calibrar:</label>
+                <select id="advMotorSelect" required>
+                    <!-- Módulo A -->
+                    <option value="0">MA1</option><option value="1">MA2</option><option value="2">MA3</option>
+                    <option value="3">MA4</option><option value="4">MA5</option><option value="5">MA6</option>
+                    <!-- Módulo B -->
+                    <option value="6">MB1</option><option value="7">MB2</option><option value="8">MB3</option>
+                    <option value="9">MB4</option><option value="10">MB5</option><option value="11">MB6</option>
+                    <!-- Rebombeo -->
+                    <option value="12">REB1 (Rebombeo)</option><option value="13">REB2 (Rebombeo)</option>
+                    <option value="14">REB3 (Rebombeo)</option><option value="15">REB4 (Rebombeo)</option>
+                    <option value="16">REB5 (Rebombeo)</option><option value="17">REB6 (Rebombeo)</option>
+                    <!-- San Ramón -->
+                    <option value="18">RAM1 (San Ramón)</option><option value="19">RAM2 (San Ramón)</option>
+                    <option value="20">RAM3 (San Ramón)</option><option value="21">RAM4 (San Ramón)</option>
+                    <option value="22">RAM5 (San Ramón)</option><option value="23">RAM6 (San Ramón)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Nombre Personalizado (Siglas / Etiqueta):</label>
+                <input type="text" id="customNameInput" placeholder="Ej: Bomba Principal A (Dejar vacío para nombre por defecto)">
+            </div>
+
+            <div class="flex-group">
+                <div class="form-group">
+                    <label>Horas Totales (Calibración):</label>
+                    <input type="number" id="totalHoursInput" step="0.01" min="0" placeholder="Ej: 1500.50">
+                </div>
+                <div class="form-group">
+                    <label>Horas Último Ciclo:</label>
+                    <input type="number" id="lastCycleHoursInput" step="0.01" min="0" placeholder="Ej: 8.5">
+                </div>
+            </div>
+
+            <button type="submit" style="background-color: #f39c12;">Guardar Configuración Avanzada</button>
+        </form>
+        
         <button id="logoutBtn">Cerrar Sesión</button>
     </div>
 
