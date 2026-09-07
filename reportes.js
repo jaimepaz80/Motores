@@ -8,7 +8,6 @@ const tableContainer = document.getElementById('tableContainer');
 const reportTableBody = document.getElementById('reportTableBody');
 const totalHoursCell = document.getElementById('totalHoursCell');
 
-// Nomenclaturas exactas
 function getMotorInfo(id) {
     if (id < 6) return { station: 'Módulo A', prefix: 'MA', num: (id % 6) + 1 };
     if (id < 12) return { station: 'Módulo B', prefix: 'MB', num: (id % 6) + 1 };
@@ -25,7 +24,6 @@ reportForm.addEventListener('submit', async (e) => {
     const endFilter = new Date(document.getElementById('filterEnd').value).getTime();
     const filterType = document.getElementById('filterType').value;
     
-    // Leer checkboxes seleccionados
     const checkboxes = document.querySelectorAll('.station-cb:checked');
     const selectedStations = Array.from(checkboxes).map(cb => cb.value);
 
@@ -40,9 +38,14 @@ reportForm.addEventListener('submit', async (e) => {
     }
 
     try {
+        // Cargar historial de bombeo
         const historyRef = ref(db, 'historial_bombeo');
         const snapshot = await get(historyRef);
         
+        // Cargar perfiles de motores (Para obtener los nombres personalizados actuales)
+        const motorsSnap = await get(ref(db, 'motors'));
+        const motorsProfile = motorsSnap.exists() ? motorsSnap.val() : {};
+
         if (!snapshot.exists()) {
             alert("No hay registros en el historial.");
             return;
@@ -53,7 +56,6 @@ reportForm.addEventListener('submit', async (e) => {
             allEvents.push(child.val());
         });
 
-        // Agrupar eventos por motor y ordenarlos cronológicamente
         const eventsByMotor = {};
         for(let i=0; i<24; i++) eventsByMotor[i] = [];
         
@@ -70,19 +72,20 @@ reportForm.addEventListener('submit', async (e) => {
         currentReportData = [];
         let grandTotalHours = 0;
 
-        // Calcular horas con lógica de solapamiento
         for (let i = 0; i < 24; i++) {
             const motorInfo = getMotorInfo(i);
             
-            // Filtro de estación múltiple
             if (!selectedStations.includes(motorInfo.prefix)) continue;
 
             const events = eventsByMotor[i];
             if (events.length === 0) continue;
 
-            // Filtro de tipo (tomamos el tipo del último evento conocido en el rango)
             let latestType = events[events.length - 1].type;
             if (filterType !== 'Ambos' && latestType !== filterType) continue;
+
+            // Nomenclatura del Reporte
+            const profile = motorsProfile[i] || {};
+            const finalName = profile.customName ? profile.customName : `${motorInfo.prefix}${motorInfo.num}`;
 
             let totalMilliseconds = 0;
             let isOn = false;
@@ -95,7 +98,6 @@ reportForm.addEventListener('submit', async (e) => {
                 } else if (ev.event === 'Apagado' && isOn) {
                     const endTime = ev.timestamp;
                     
-                    // Calcular cruce de intervalos
                     const overlapStart = Math.max(startTime, startFilter);
                     const overlapEnd = Math.min(endTime, endFilter);
                     
@@ -106,10 +108,9 @@ reportForm.addEventListener('submit', async (e) => {
                 }
             });
 
-            // Si quedó encendido (intervalo abierto), usar Fecha Fin como cierre virtual
             if (isOn) {
                 const overlapStart = Math.max(startTime, startFilter);
-                const overlapEnd = Math.min(Date.now(), endFilter); // Protege contra futuros irreales
+                const overlapEnd = Math.min(Date.now(), endFilter); 
                 if (overlapEnd > overlapStart) {
                     totalMilliseconds += (overlapEnd - overlapStart);
                 }
@@ -121,14 +122,13 @@ reportForm.addEventListener('submit', async (e) => {
                 grandTotalHours += hours;
                 currentReportData.push({
                     station: motorInfo.station,
-                    name: `${motorInfo.prefix}${motorInfo.num}`,
+                    name: finalName,
                     type: latestType,
                     hours: hours.toFixed(2)
                 });
             }
         }
 
-        // Renderizar Tabla
         reportTableBody.innerHTML = '';
         currentReportData.forEach(row => {
             const tr = document.createElement('tr');
@@ -151,7 +151,6 @@ reportForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Lógica de jsPDF nativo
 btnPdf.addEventListener('click', () => {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
