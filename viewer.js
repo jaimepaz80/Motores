@@ -14,7 +14,6 @@ let initialLoad = true;
 let previousState = {};
 let lastKnownData = null;
 
-// Solicitar permiso de notificaciones de Android/Chrome al entrar
 if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
     Notification.requestPermission();
 }
@@ -35,6 +34,7 @@ function getStatusClass(status) {
 
 function triggerAlert(index, motorData) {
     const motorInfo = getMotorInfo(index);
+    const finalName = motorData.customName ? motorData.customName : `${motorInfo.prefix}${motorInfo.num}`;
     const isPrendido = motorData.status === 'Prendido';
     const colorClass = isPrendido ? 'alert-green' : 'alert-red';
     const title = isPrendido ? 'MOTOR ENCENDIDO' : 'MOTOR APAGADO';
@@ -42,21 +42,19 @@ function triggerAlert(index, motorData) {
     const eventTime = motorData.last_eventTime ? new Date(motorData.last_eventTime).toLocaleString() : new Date().toLocaleString();
     const obsText = motorData.observacion ? `<br><b>Observaciones:</b> ${motorData.observacion}` : '';
 
-    // Notificación Nativa Android vía Service Worker
     if ("Notification" in window && Notification.permission === "granted") {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.ready.then((registration) => {
                 registration.showNotification(`Majagual: ${title}`, {
-                    body: `${motorInfo.station} - ${motorInfo.prefix}${motorInfo.num}\nFecha/Hora: ${eventTime}`,
-                    icon: './icono.png', // Usa el logo que subiste
-                    vibrate: [200, 100, 200, 100, 200], // Patrón de vibración de alerta
-                    requireInteraction: true // Mantiene la notificación hasta que el usuario la toque
+                    body: `${motorInfo.station} - ${finalName}\nFecha/Hora: ${eventTime}`,
+                    icon: './icono.png',
+                    vibrate: [200, 100, 200, 100, 200],
+                    requireInteraction: true 
                 });
             });
         }
     }
 
-    // Ventana Emergente Modal
     const modal = document.getElementById('alertModal');
     const box = document.getElementById('alertBox');
     const titleEl = document.getElementById('alertTitle');
@@ -66,7 +64,7 @@ function triggerAlert(index, motorData) {
     titleEl.textContent = title;
     detailsEl.innerHTML = `
         <p><b>Estación:</b> ${motorInfo.station}</p>
-        <p><b>Bomba:</b> ${motorInfo.prefix}${motorInfo.num}</p>
+        <p><b>Bomba:</b> ${finalName}</p>
         <p><b>Tipo:</b> ${motorData.type}</p>
         <p><b>Fecha y Hora:</b> ${eventTime}</p>
         ${!isPrendido ? `<p style="color: #e74c3c;">${obsText}</p>` : ''}
@@ -80,10 +78,8 @@ document.getElementById('alertCloseBtn').addEventListener('click', () => {
 });
 
 function renderGrid(data) {
-    moduleAGrid.innerHTML = ''; 
-    moduleBGrid.innerHTML = '';
-    moduleCGrid.innerHTML = ''; 
-    moduleDGrid.innerHTML = '';
+    moduleAGrid.innerHTML = ''; moduleBGrid.innerHTML = '';
+    moduleCGrid.innerHTML = ''; moduleDGrid.innerHTML = '';
 
     for (let i = 0; i < 24; i++) {
         const motorData = data[i] || { status: 'Apagado', type: 'Desconocido', observacion: '' };
@@ -95,7 +91,9 @@ function renderGrid(data) {
         if (motorInfo.prefix === 'REB') gridTarget = moduleCGrid;
         if (motorInfo.prefix === 'RAM') gridTarget = moduleDGrid;
 
-        const motorName = `${motorInfo.prefix}${motorInfo.num}`;
+        // Selección de Nombre: Personalizado vs Defecto
+        const finalName = motorData.customName ? motorData.customName : `${motorInfo.prefix}${motorInfo.num}`;
+        
         let displayStatus = motorData.status;
         let displayType = motorData.type;
         let hoursHtml = '';
@@ -107,7 +105,6 @@ function renderGrid(data) {
                 displayStatus = `Apagado<br><span style="font-size: 0.85em; font-weight: bold; color: #555;">(Obs: ${motorData.observacion})</span>`;
             }
             
-            // Lógica del Cronómetro vs Estático
             const totalH = motorData.total_hours || 0;
             const lastH = motorData.last_cycle_hours || 0;
             
@@ -122,7 +119,7 @@ function renderGrid(data) {
 
         motorCard.className = `motor-card ${getStatusClass(motorData.status)}`;
         motorCard.innerHTML = `
-            <div class="motor-name">${motorName}</div>
+            <div class="motor-name">${finalName}</div>
             <div class="motor-type">${displayType}</div>
             <div class="motor-status">${displayStatus}</div>
             ${hoursHtml}
@@ -134,11 +131,9 @@ function renderGrid(data) {
 onValue(motorsRef, (snapshot) => {
     const data = snapshot.val();
     if (data) {
-        lastKnownData = data; // Guardamos en memoria local
+        lastKnownData = data; 
         if (initialLoad) {
-            for (let i = 0; i < 24; i++) {
-                previousState[i] = data[i] ? data[i].status : 'Apagado';
-            }
+            for (let i = 0; i < 24; i++) previousState[i] = data[i] ? data[i].status : 'Apagado';
             initialLoad = false;
         } else {
             for (let i = 0; i < 24; i++) {
@@ -157,7 +152,6 @@ onValue(motorsRef, (snapshot) => {
     }
 });
 
-// Bucle de cronómetro: re-renderiza la pantalla cada 60 segundos leyendo la memoria
 setInterval(() => {
     if (lastKnownData) renderGrid(lastKnownData);
 }, 60000);
