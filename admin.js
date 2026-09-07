@@ -136,7 +136,7 @@ advMotorSelect.addEventListener('change', async () => {
     }
 });
 
-// CONFIGURACIÓN AVANZADA: Guardar
+// CONFIGURACIÓN AVANZADA: Guardar con candado matemático
 advancedForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const index = advMotorSelect.value;
@@ -146,12 +146,27 @@ advancedForm.addEventListener('submit', async (e) => {
         const snapshot = await get(motorRef);
         const currentData = snapshot.exists() ? snapshot.val() : { status: 'Apagado', type: 'Desconocido' };
 
-        // Actualizar solo nombre y horas, manteniendo el estatus intacto
+        const inputTotal = parseFloat(totalHoursInput.value) || 0;
+        const inputLastCycle = parseFloat(lastCycleHoursInput.value) || 0;
+        
+        // Verificamos si el administrador intentó alterar los números
+        const dbTotal = currentData.total_hours ? parseFloat(currentData.total_hours.toFixed(2)) : 0;
+        const dbLastCycle = currentData.last_cycle_hours ? parseFloat(currentData.last_cycle_hours.toFixed(2)) : 0;
+        
+        const hoursChanged = (inputTotal !== dbTotal) || (inputLastCycle !== dbLastCycle);
+
+        // BLOQUEO MATEMÁTICO: No permitir calibrar horas si el motor está encendido
+        if (hoursChanged && currentData.status === 'Prendido') {
+            alert("ERROR: No puede calibrar o reiniciar las horas de un motor mientras está PRENDIDO, porque el cronómetro en vivo está sumando tiempo. Por favor, APAGUE el motor desde el panel de operación y luego calibre las horas a cero.");
+            return; // Detiene la transacción
+        }
+
+        // Si pasó el filtro, actualiza (permite cambiar nombre aunque esté prendido si no tocó las horas)
         const updateData = {
             ...currentData,
             customName: customNameInput.value.trim(),
-            total_hours: parseFloat(totalHoursInput.value) || 0,
-            last_cycle_hours: parseFloat(lastCycleHoursInput.value) || 0
+            total_hours: inputTotal,
+            last_cycle_hours: inputLastCycle
         };
 
         await set(motorRef, updateData);
